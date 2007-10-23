@@ -5,10 +5,20 @@
 
 [1]: http://www.jedrea.com/chmlib/
 
+## Requirement ##
+
+I compiled ant tested at
+
+	$ swig -version
+	SWIG Version 1.3.31
+	Compiled with /usr/bin/g++-4.0 [i686-apple-darwin8.10.1]
+
+	$ ruby -v
+	ruby 1.8.2 (2004-12-25) [universal-darwin8.0]
+
 ## See Also ##
 
  * http://gnochm.sourceforge.net/pychm.html
-
 
 ## License ##
 

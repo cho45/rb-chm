@@ -147,8 +147,6 @@ class Chmlib::Chm
 
 	def resolve_object(path)
 		ui = Chmlib::ChmUnitInfo.new
-		p caller
-		p [@h, path, ui]
 		unless Chmlib.chm_resolve_object(@h, path, ui) == Chmlib::CHM_RESOLVE_SUCCESS
 			raise ResolvError
 		end
