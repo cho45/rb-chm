@@ -3,6 +3,7 @@
 
 
 require "chmlib"
+require "nkf"
 
 class Chmlib::Chm
 	class ChmError < StandardError; end
@@ -36,7 +37,14 @@ class Chmlib::Chm
 		text.scan(/<OBJECT type="text\/sitemap">(.+?)<\/OBJECT>/m) do |m|
 			local = m[0][/<param name="Local" value="([^"]+)">/, 1]
 			m[0].scan(/<param name="Name" value="([^"]+)">/) do |n|
-				(index[n[0]] ||= []) << local
+				n = n[0]
+				next unless n
+				next if n.empty? or n.match(/^\s+$/)
+				n.gsub!(/&amp;/, "&")
+				n.gsub!(/&lt;/, "<")
+				n.gsub!(/&gt;/, ">")
+				n = NKF.nkf("-w", n)
+				(index[n] ||= []) << local
 			end
 		end
 		@index_cache = index.to_a
