@@ -1,0 +1,19 @@
+
+# chm on Ruby #
+
+[chmlib][1] ruby binding.
+
+[1]: http://www.jedrea.com/chmlib/
+
+## See Also ##
+
+ * http://gnochm.sourceforge.net/pychm.html
+
+
+## License ##
+
+Apply GPL because
+some code copied from PyCHM and chmlib.h.
+
+See COPYING to get more information.
+
