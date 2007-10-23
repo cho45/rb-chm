@@ -13,6 +13,7 @@ class Chmlib::Chm
 
 	def initialize(filename)
 		@h = Chmlib.chm_open(filename)
+		raise ChmError, "Not exists?" unless @h
 		get_archive_info()
 	end
 
@@ -146,6 +147,8 @@ class Chmlib::Chm
 
 	def resolve_object(path)
 		ui = Chmlib::ChmUnitInfo.new
+		p caller
+		p [@h, path, ui]
 		unless Chmlib.chm_resolve_object(@h, path, ui) == Chmlib::CHM_RESOLVE_SUCCESS
 			raise ResolvError
 		end
@@ -164,7 +167,7 @@ class Chmlib::Chm
 end
 
 if $0 == __FILE__
-	chm = Chmlib::Chm.new("/Users/cho45/tmp/ruby-refm-rdp-1.9.0-ja-htmlhelp_css/rubymanjp.chm")
+	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/rubymanjp.chm")
 	require "pp"
 	chm.index #cache
 	puts "ok"
