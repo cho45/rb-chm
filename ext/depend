@@ -1,0 +1,3 @@
+chmlib_wrap.c: chmlib.i
+	swig -ruby chmlib.i
+
