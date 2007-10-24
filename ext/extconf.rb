@@ -7,6 +7,7 @@ require "mkmf"
 
 dir_config("chm")
 if have_header("chm_lib.h") && have_library("chm", "chm_open")
+	$LDFLAGS << "-L."
 	create_makefile("chmlib")
 end
 

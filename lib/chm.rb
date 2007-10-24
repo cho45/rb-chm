@@ -10,7 +10,7 @@ class Chmlib::Chm
 	class ResolvError < ChmError; end
 	class RetrieveError < ChmError; end
 
-	attr_reader :home, :title
+	attr_reader :home
 
 	def initialize(filename)
 		@h = Chmlib.chm_open(filename)
@@ -20,6 +20,10 @@ class Chmlib::Chm
 
 	def close
 		Chmlib.chm_close(@h)
+	end
+
+	def title
+		NKF.nkf("-w", @title)
 	end
 
 	def index
@@ -43,6 +47,7 @@ class Chmlib::Chm
 				n.gsub!(/&amp;/, "&")
 				n.gsub!(/&lt;/, "<")
 				n.gsub!(/&gt;/, ">")
+				n.gsub!(/&quot;/, "\"")
 				n = NKF.nkf("-w", n)
 				(index[n] ||= []) << local
 			end
