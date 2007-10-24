@@ -57,9 +57,9 @@ class Chmlib::Chm
 		#</OBJECT>
 
 		index = {}
-		text.scan(/<OBJECT type="text\/sitemap">(.+?)<\/OBJECT>/m) do |m|
-			local = m[0][/<param name="Local" value="([^"]+)">/, 1]
-			m[0].scan(/<param name="Name" value="([^"]+)">/) do |n|
+		text.scan(/<OBJECT\s+type="text\/sitemap">(.+?)<\/OBJECT>/m) do |m|
+			local = m[0][/<param\s+name="Local"\s+value="([^"]+)">/, 1]
+			m[0].scan(/<param\s+name="Name"\s+value="([^"]+)">/) do |n|
 				n = n[0]
 				next unless n
 				next if n.empty? or n.match(/^\s+$/)
@@ -86,8 +86,8 @@ class Chmlib::Chm
 		while s.scan(/<(LI|UL|\/UL)>\s*/)
 			case s[1]
 			when "LI"
-				s.skip(%r{<OBJECT type="text/sitemap">\s*})
-				s.scan(%r{<param name="Name" value="([^"]+)">\s*(<param name="Local" value="([^"]+)">)?\s*})
+				s.skip(%r{<OBJECT\s+type="text/sitemap">\s*})
+				s.scan(%r{<param\s+name="Name"\s+value="([^"]+)">\s*(<param\s+name="Local"\s+value="([^"]+)">)?\s*})
 				current << {
 					:name   => unescape!(s[1]),
 					:local  => s[3] || "",
@@ -184,32 +184,29 @@ class Chmlib::Chm
 	end
 
 	def get_windows_info
-		text = retrieve_object("/#WINDOWS")
-		num_entries, entry_size = text.unpack("VV")
+		# logic from Chmox
+		windowsData = retrieve_object("/#WINDOWS")
+		stringsData = retrieve_object("/#STRINGS")
 
-		return if num_entries < 1
+		if !windowsData.empty? && !stringsData.empty?
+			entryCount, entrySize = windowsData.unpack("VV")
+			#p "Entries: %d x %d bytes" % [entryCount, entrySize]
 
-		text = retrieve_object("/#WINDOWS", 8, entry_size)
-		return if text.length <  entry_size
+			entryIndex = 0
+			while entryIndex < entryCount
+				entryOffset = 8 + ( entryIndex * entrySize );
 
-		toc_index, idx_index, dft_index = text.unpack("V3")
-
-		text = retrieve_object("/#STRINGS")
-
-		unless @topics
-			@topics = text[toc_index..-1].unpack("Z*")
-			@topics = "/#{@topics}" unless @topics[0] == ?/
+				#_title = readTrimmedString( stringsData, readLong( windowsData, entryOffset + 0x14 ) );
+				toc_index, idx_index, dft_index = windowsData[entryOffset+0x60,12].unpack("V3")
+				@topics = stringsData[toc_index..-1].unpack("Z*")[0] if @topics.nil? || @topics.empty?
+				@index  = stringsData[idx_index..-1].unpack("Z*")[0] if @index.nil?  || @index.empty?
+				@home   = stringsData[dft_index..-1].unpack("Z*")[0] if @home.nil?   || @home.empty?
+				entryIndex += 1
+			end
 		end
-
-		unless @index
-			@index = text[tdx_index..-1].unpack("Z*")
-			@index = "/#{@index}" unless @index[0] == ?/
-		end
-
-		unless dft_index == 0
-			@home = text[dft_index..-1].unpack("Z*")
-			@home = "/#{@home}" unless @home[0] == ?/
-		end
+		@topics = "/#{@topics}" unless @topics[0] == ?/
+		@index  = "/#{@index}"  unless @index[0]  == ?/
+		@home   = "/#{@home}"   unless @home[0]   == ?/
 	rescue ResolvError
 	end
 
@@ -240,5 +237,10 @@ if $0 == __FILE__
 #	pp chm.index.select {|k,v| /split/i === k }
 	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/kr2doc.chm")
 	pp chm.home
+	#pp chm.topics
+	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/gauche-refj-0.8.7.chm")
+	pp chm.home
+	pp chm.instance_eval { @index }
+	pp chm.index
 	#pp chm.topics
 end
