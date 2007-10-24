@@ -44,10 +44,10 @@ class Chmlib::Chm
 				n = n[0]
 				next unless n
 				next if n.empty? or n.match(/^\s+$/)
-				n.gsub!(/&amp;/, "&")
 				n.gsub!(/&lt;/, "<")
 				n.gsub!(/&gt;/, ">")
 				n.gsub!(/&quot;/, "\"")
+				n.gsub!(/&amp;/, "&")
 				n = NKF.nkf("-w", n)
 				(index[n] ||= []) << local
 			end
