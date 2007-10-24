@@ -3,6 +3,7 @@
 
 
 require "chmlib"
+require "strscan"
 require "nkf"
 
 class Chmlib::Chm
@@ -13,6 +14,7 @@ class Chmlib::Chm
 	attr_reader :home
 
 	def initialize(filename)
+		@filename = filename
 		@h = Chmlib.chm_open(filename)
 		raise ChmError, "Not exists?" unless @h
 		get_archive_info()
@@ -26,11 +28,28 @@ class Chmlib::Chm
 		NKF.nkf("-w", @title)
 	end
 
+	def home
+		if File.basename(@filename, ".chm") == File.basename(@home)
+			@home = self.topics.flatten.find {|i| i[:local] }[:local]
+		else
+			@home
+		end
+	end
+
+	def unescape!(n)
+		n.gsub!(/&lt;/, "<")
+		n.gsub!(/&gt;/, ">")
+		n.gsub!(/&quot;/, "\"")
+		n.gsub!(/&amp;/, "&")
+		n
+	end
+
+	# keyword index
 	def index
 		return nil unless @index
 		return @index_cache if @index_cache
 
-		text = retrieve_object(@index)
+		text = NKF.nkf("-w", retrieve_object(@index))
 		#<OBJECT type="text/sitemap">
 		#<param name="Name" value="pushd(path = nil, &amp;block) (c/m Shell) (ruby-src:doc/shell.rd)">
 		#<param name="Name" value="pushd(path = nil, ? (c/m Shell) (ruby-src:doc/shell.rd)">
@@ -44,15 +63,51 @@ class Chmlib::Chm
 				n = n[0]
 				next unless n
 				next if n.empty? or n.match(/^\s+$/)
-				n.gsub!(/&lt;/, "<")
-				n.gsub!(/&gt;/, ">")
-				n.gsub!(/&quot;/, "\"")
-				n.gsub!(/&amp;/, "&")
-				n = NKF.nkf("-w", n)
+				unescape!(n)
 				(index[n] ||= []) << local
 			end
 		end
 		@index_cache = index.to_a
+	end
+
+	# table of contents
+	def topics
+		return nil unless @topics
+		return @topics_cache if @topics_cache
+
+		text = NKF.nkf("-w", retrieve_object(@topics))
+		result = []
+
+		s = StringScanner.new(text)
+		s.skip(/.*?<UL>\s*/m)
+
+		current = result
+		level   = []
+		while s.scan(/<(LI|UL|\/UL)>\s*/)
+			case s[1]
+			when "LI"
+				s.skip(%r{<OBJECT type="text/sitemap">\s*})
+				s.scan(%r{<param name="Name" value="([^"]+)">\s*(<param name="Local" value="([^"]+)">)?\s*})
+				current << {
+					:name   => unescape!(s[1]),
+					:local  => s[3] || "",
+					:children => []
+				}
+				s.skip(%r{.*?</OBJECT>\s*})
+			when "UL"
+				level << current
+				current = current.last[:children]
+			when "/UL"
+				current = level.pop
+			end
+		end
+
+
+		# result = [
+		#     {name:"name",local:"",child:[]},
+		#     ],
+		#
+		@topics_cache = result
 	end
 
 	def get_archive_info
@@ -178,9 +233,12 @@ class Chmlib::Chm
 end
 
 if $0 == __FILE__
-	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/rubymanjp.chm")
 	require "pp"
-	chm.index #cache
-	puts "ok"
-	pp chm.index.select {|k,v| /split/i === k }
+	#chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/rubymanjp.chm")
+#	chm.index #cache
+#	puts "ok"
+#	pp chm.index.select {|k,v| /split/i === k }
+	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/kr2doc.chm")
+	pp chm.home
+	#pp chm.topics
 end
