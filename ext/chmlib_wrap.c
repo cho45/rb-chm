@@ -2423,6 +2423,57 @@ fail:
 }
 
 
+SWIGINTERN VALUE
+_wrap_chm_search(int argc, VALUE *argv, VALUE self) {
+  struct chmFile *arg1 = (struct chmFile *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  VALUE result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  VALUE vresult = Qnil;
+  
+  if ((argc < 4) || (argc > 4)) {
+    rb_raise(rb_eArgError, "wrong # of arguments(%d for 4)",argc); SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_chmFile, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "chm_search" "', argument " "1"" of type '" "struct chmFile *""'"); 
+  }
+  arg1 = (struct chmFile *)(argp1);
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "chm_search" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "chm_search" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  ecode4 = SWIG_AsVal_int(argv[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "chm_search" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  result = (VALUE)chm_search(arg1,(char const *)arg2,arg3,arg4);
+  vresult = result;
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return vresult;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return Qnil;
+}
+
+
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
@@ -2749,5 +2800,6 @@ SWIGEXPORT void Init_chmlib(void) {
   rb_define_const(mChmlib, "CHM_ENUMERATOR_SUCCESS", SWIG_From_int((int)((2))));
   rb_define_module_function(mChmlib, "chm_enumerate", _wrap_chm_enumerate, -1);
   rb_define_module_function(mChmlib, "chm_enumerate_dir", _wrap_chm_enumerate_dir, -1);
+  rb_define_module_function(mChmlib, "chm_search", _wrap_chm_search, -1);
 }
 

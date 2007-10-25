@@ -13,13 +13,12 @@
     if ($1 == NULL) SWIG_fail;
 }
 
-%typemap(argout,fragment="t_output_helper") unsigned char *OUTPUT {
+%typemap(argout) unsigned char *OUTPUT {
     VALUE o;
     o = rb_str_new($1, arg5);
     $result = o;
     free($1);
 }
-
 
 
 
@@ -168,5 +167,7 @@ int chm_enumerate_dir(struct chmFile *h,
 
 #endif /* INCLUDED_CHMLIB_H */
 
-
-
+VALUE
+chm_search (struct chmFile *chmfile,
+		const char *text, int whole_words,
+		int titles_only);
