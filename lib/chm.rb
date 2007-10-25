@@ -53,8 +53,8 @@ class Chmlib::Chm
 
 	def search(text, opt={})
 		return [] unless self.searchable?
-		(Chmlib.chm_search(@h, text, 0, 0) || []).map {|url, title|
-			[url, NKF.nkf("-w", title)]
+		(Chmlib.chm_search(@h, text.to_s, 0, 0) || []).map {|url, title|
+			[NKF.nkf("-w", title.to_s), url]
 		}
 	end
 
