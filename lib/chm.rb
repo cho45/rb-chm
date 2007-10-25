@@ -72,11 +72,7 @@ class Chmlib::Chm
 		return @index_cache if @index_cache
 
 		text = NKF.nkf("-w", retrieve_object(@index))
-		#<OBJECT type="text/sitemap">
-		#<param name="Name" value="pushd(path = nil, &amp;block) (c/m Shell) (ruby-src:doc/shell.rd)">
-		#<param name="Name" value="pushd(path = nil, ? (c/m Shell) (ruby-src:doc/shell.rd)">
-		#<param name="Local" value="refm570.html#L011275">
-		#</OBJECT>
+		#puts text[0, 1000]
 
 		index = {}
 		text.scan(/<OBJECT\s+type="text\/sitemap">(.+?)<\/OBJECT>/m) do |m|
@@ -98,14 +94,14 @@ class Chmlib::Chm
 		return @topics_cache if @topics_cache
 
 		text = NKF.nkf("-w", retrieve_object(@topics))
-		result = []
+		result = {:children => []}
 
 		s = StringScanner.new(text)
-		s.skip(/.*?<UL>\s*/m)
+		s.skip(/.*?(?=<UL>)/m)
 
-		current = result
+		current = [result]
 		level   = []
-		while s.scan(/<(LI|UL|\/UL)>\s*/)
+		while s.scan(/\s*<(LI|UL|\/UL)>\s*/)
 			case s[1]
 			when "LI"
 				s.skip(%r{<OBJECT\s+type="text/sitemap">\s*})
@@ -262,11 +258,12 @@ if $0 == __FILE__
 	#pp chm.topics
 	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/gauche-refj-0.8.7.chm")
 	pp chm.home
-	pp chm.instance_eval { @index }
+	#pp chm.instance_eval { @index }
 	#pp chm.index
-	pp chm.searchable?
-	pp chm.search("list")
-	#pp chm.topics
+	#pp chm.searchable?
+	#pp chm.search("list")
+	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/macro.chm")
+	pp chm.topics
 end
 
 __END__
