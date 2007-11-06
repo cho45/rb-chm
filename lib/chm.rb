@@ -75,9 +75,9 @@ class Chmlib::Chm
 		#puts text[0, 1000]
 
 		index = {}
-		text.scan(/<OBJECT\s+type="text\/sitemap">(.+?)<\/OBJECT>/m) do |m|
-			local = m[0][/<param\s+name="Local"\s+value="([^"]+)">/, 1]
-			m[0].scan(/<param\s+name="Name"\s+value="([^"]+)">/) do |n|
+		text.scan(/<OBJECT\s+type="text\/sitemap">(.+?)<\/OBJECT>/im) do |m|
+			local = m[0][/<param\s+name="Local"\s+value="([^"]+)">/i, 1]
+			m[0].scan(/<param\s+name="Name"\s+value="([^"]+)">/i) do |n|
 				n = n[0]
 				next unless n
 				next if n.empty? or n.match(/^\s+$/)
@@ -262,8 +262,8 @@ if $0 == __FILE__
 	#pp chm.index
 	#pp chm.searchable?
 	#pp chm.search("list")
-	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/macro.chm")
-	pp chm.topics
+	chm = Chmlib::Chm.new("/Users/cho45/htmlhelp/Haskell.chm")
+	pp chm.index
 end
 
 __END__
