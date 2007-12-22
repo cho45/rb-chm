@@ -241,7 +241,7 @@ class Chmlib::Chm
 		length = ui.length unless length
 		text = Chmlib.chm_retrieve_object(@h, ui, offset, length)
 		if ui.length.zero?
-			raise RetrieveError
+			raise RetrieveError, path
 		end
 		text
 	end
