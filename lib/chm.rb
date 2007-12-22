@@ -86,6 +86,8 @@ class Chmlib::Chm
 			end
 		end
 		@index_cache = index.to_a
+	rescue RetrieveError => e
+		return nil
 	end
 
 	# table of contents
