@@ -76,13 +76,23 @@ class Chmlib::Chm
 
 		index = {}
 		text.scan(/<OBJECT\s+type="text\/sitemap">(.+?)<\/OBJECT>/im) do |m|
-			local = m[0][/<param\s+name="Local"\s+value="([^"]+)">/i, 1]
-			m[0].scan(/<param\s+name="Name"\s+value="([^"]+)">/i) do |n|
-				n = n[0]
-				next unless n
-				next if n.empty? or n.match(/^\s+$/)
-				unescape!(n)
-				(index[n] ||= []) << local
+			names = []
+			prev = nil
+			m[0].scan(/<param\s+name="(Local|Name)"\s+value="([^"]+)">/i) do |param|
+				case param[0]
+				when /name/i
+					names.pop if /local/i === prev 
+					n = param[1]
+					next unless n
+					next if n.empty? or n.match(/^\s+$/)
+					unescape!(n)
+					names << n
+				when /local/i
+					names.each do |n|
+						(index[n] ||= []) << param[1]
+					end
+				end
+				prev = $1
 			end
 		end
 		@index_cache = index.to_a
