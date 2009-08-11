@@ -109,21 +109,21 @@ class Chmlib::Chm
 		result = {:children => []}
 
 		s = StringScanner.new(text)
-		s.skip(/.*?(?=<UL>)/m)
+		s.skip(/.*?(?=<UL>)/mi)
 
 		current = [result]
 		level   = []
-		while s.scan(/\s*<(LI|UL|\/UL)>\s*/)
-			case s[1]
+		while r = s.scan(/\s*<(LI|UL|\/UL)>\s*/i)
+			case s[1].upcase
 			when "LI"
-				s.skip(%r{<OBJECT\s+type="text/sitemap">\s*})
-				s.scan(%r{<param\s+name="Name"\s+value="([^"]+)">\s*(<param\s+name="Local"\s+value="([^"]+)">)?\s*})
+				s.skip(%r{<OBJECT\s+type="text/sitemap">\s*}i)
+				s.scan(%r{<param\s+name="Name"\s+value="([^"]+)">\s*(<param\s+name="Local"\s+value="([^"]+)">)?\s*}i)
 				current << {
 					:name   => unescape!(s[1]),
 					:local  => s[3] || "",
 					:children => []
 				}
-				s.skip(%r{.*?</OBJECT>\s*})
+				s.skip(%r{.*?</OBJECT>\s*}i)
 			when "UL"
 				level << current
 				current = current.last[:children]
