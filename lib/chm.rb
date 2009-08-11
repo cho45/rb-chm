@@ -92,10 +92,10 @@ class Chmlib::Chm
 						(index[n] ||= []) << param[1]
 					end
 				end
-				prev = $1
+				prev = param[0]
 			end
 		end
-		@index_cache = index.to_a
+		@index_cache = index.to_a.map{|v| v[1].uniq!;v}
 	rescue RetrieveError => e
 		return nil
 	end
