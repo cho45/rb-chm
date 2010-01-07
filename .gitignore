@@ -1,0 +1,5 @@
+.config
+ext/Makefile
+ext/chmlib.bundle
+ext/mkmf.log
+
