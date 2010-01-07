@@ -1,0 +1,3 @@
+[submodule "modules/chmlib"]
+	path = modules/chmlib
+	url = git://github.com/jedwing/CHMLib.git
